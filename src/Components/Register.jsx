@@ -46,8 +46,15 @@ const Register = () => {
         console.log(userCredential)
         updateProfile(auth.currentUser, { displayName: form.username })
           .then(() => {
-            // Profile updated!
-            // ...
+            // ----authentications 
+            console.log('email succesfull')
+
+            sendEmailVerification(auth.currentUser)
+  .then(() => {
+    // Email verification sent!
+    // ...
+  });
+            
           })
           .catch((error) => {
             // An error occurred
