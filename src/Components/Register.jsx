@@ -3,7 +3,11 @@ import React, { useState } from "react";
 import { FiMail, FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import { Bounce, toast } from "react-toastify";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 
 const Register = () => {
   const auth = getAuth();
@@ -38,10 +42,8 @@ const Register = () => {
     // ------------api ------------
     createUserWithEmailAndPassword(auth, form.email, form.password)
       .then((userCredential) => {
-
-        console.log(userCredential)
         // ----------user anme catch api
-
+        console.log(userCredential)
         updateProfile(auth.currentUser, { displayName: form.username })
           .then(() => {
             // Profile updated!
