@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { FiMail, FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import { Bounce, toast } from "react-toastify";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const Register = () => {
   const auth = getAuth();
@@ -23,7 +23,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = (e) => {
-
     e.preventDefault();
 
     if (!form.username) {
@@ -37,21 +36,26 @@ const Register = () => {
     }
 
     // ------------api ------------
-    createUserWithEmailAndPassword(
-      auth,
-      form.email,
-      form.password,
-    )
+    createUserWithEmailAndPassword(auth, form.email, form.password)
       .then((userCredential) => {
-        // Signed up
-        const user = userCredential.user;
-        console.log(user)
-        // ...
+
+        console.log(userCredential)
+        // ----------user anme catch api
+
+        updateProfile(auth.currentUser, { displayName: form.username })
+          .then(() => {
+            // Profile updated!
+            // ...
+          })
+          .catch((error) => {
+            // An error occurred
+            // ...
+          });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(error)
+        console.log(error);
         // ..
       });
   };
