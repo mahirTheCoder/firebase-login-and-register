@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import { sendEmailVerification } from "firebase/auth/web-extension";
 
 const Register = () => {
   const auth = getAuth();
@@ -43,28 +44,40 @@ const Register = () => {
     createUserWithEmailAndPassword(auth, form.email, form.password)
       .then((userCredential) => {
         // ----------user anme catch api
-        console.log(userCredential)
+        console.log(userCredential);
         updateProfile(auth.currentUser, { displayName: form.username })
           .then(() => {
-            // ----authentications 
-            console.log('email succesfull')
-
-            sendEmailVerification(auth.currentUser)
-  .then(() => {
-    // Email verification sent!
-    // ...
-  });
+            // ----authentications
             
+            sendEmailVerification(auth.currentUser).then(() => {
+               
+              toast.success("Registration successful!");
+            
+            });
           })
           .catch((error) => {
-            // An error occurred
-            // ...
+           toast.error(error.message);
+
           });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(error);
+        console.log(errorCode);
+
+        if(errorCode == 'auth/email-already-in-use'){
+        toast.error(' Email already exist!', {
+position: "top-right",
+autoClose: 5000,
+hideProgressBar: false,
+closeOnClick: false,
+pauseOnHover: true,
+draggable: true,
+progress: undefined,
+theme: "dark",
+transition: Bounce,
+});
+        }
         // ..
       });
   };
@@ -89,7 +102,7 @@ const Register = () => {
                   setForm((prev) => ({ ...prev, username: e.target.value }));
                   setError((prev) => ({
                     ...prev,
-                    passError: "border-gray-300",
+                    username: "border-gray-300",
                   }));
                 }}
                 name="username"
@@ -111,7 +124,7 @@ const Register = () => {
                   setForm((prev) => ({ ...prev, email: e.target.value }));
                   setError((prev) => ({
                     ...prev,
-                    passError: "border-gray-300",
+                    email: "border-gray-300",
                   }));
                 }}
                 name="email"
