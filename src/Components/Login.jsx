@@ -27,52 +27,49 @@ const Login = () => {
   const onSubmit = (e) => {
     e.preventDefault();
 
-   
     if (!form.email) {
       setError((prev) => ({ ...prev, emailError: "border-red-500" }));
     }
     if (!form.password) {
       setError((prev) => ({ ...prev, passError: "border-red-500" }));
     }
-    
 
-signInWithEmailAndPassword(auth, form.email, form.password)
-  .then((userCredential) => {
-    // Signed in 
-    const user = userCredential.user;
-    if(user.emailVerified == false ){
-      toast.error('please verified your email!', {
-position: "top-right",
-autoClose: 5000,
-hideProgressBar: false,
-closeOnClick: false,
-pauseOnHover: true,
-draggable: true,
-progress: undefined,
-theme: "dark",
-transition: Bounce,
-});
-    }
-    // ...
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    if(errorCode){
-     toast.error('something went wrong!', {
-position: "top-right",
-autoClose: 5000,
-hideProgressBar: false,
-closeOnClick: false,
-pauseOnHover: true,
-draggable: true,
-progress: undefined,
-theme: "dark",
-transition: Bounce,
-});
-    }
-  });
-
+    signInWithEmailAndPassword(auth, form.email, form.password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        if (user.emailVerified == false) {
+          toast.success("Login successfully !", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
+        }
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        if (errorCode) {
+          toast.error("something went wrong!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
+        }
+      });
   };
 
   return (
@@ -83,7 +80,6 @@ transition: Bounce,
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
-
           {/* Username */}
           {/* <label className="block">
             <span className="sr-only">Username</span>
