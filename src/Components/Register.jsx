@@ -48,16 +48,13 @@ const Register = () => {
         updateProfile(auth.currentUser, { displayName: form.username })
           .then(() => {
             // ----authentications
-            
+
             sendEmailVerification(auth.currentUser).then(() => {
-               
               toast.success("Registration successful!");
-            
             });
           })
           .catch((error) => {
-           toast.error(error.message);
-
+            toast.error(error.message);
           });
       })
       .catch((error) => {
@@ -65,18 +62,18 @@ const Register = () => {
         const errorMessage = error.message;
         console.log(errorCode);
 
-        if(errorCode == 'auth/email-already-in-use'){
-        toast.error(' Email already exist!', {
-position: "top-right",
-autoClose: 5000,
-hideProgressBar: false,
-closeOnClick: false,
-pauseOnHover: true,
-draggable: true,
-progress: undefined,
-theme: "dark",
-transition: Bounce,
-});
+        if (errorCode == "auth/email-already-in-use") {
+          toast.error(" Email already exist!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            transition: Bounce,
+          });
         }
         // ..
       });
