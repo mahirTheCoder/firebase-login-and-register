@@ -11,6 +11,9 @@ import {
 import { sendEmailVerification } from "firebase/auth/web-extension";
 
 const Register = () => {
+
+  const navigate = useNavigate()
+  
   const auth = getAuth();
 
   const [form, setForm] = useState({
@@ -51,6 +54,7 @@ const Register = () => {
 
             sendEmailVerification(auth.currentUser).then(() => {
               toast.success("Registration successful!");
+              navigate('/Login')
             });
           })
           .catch((error) => {

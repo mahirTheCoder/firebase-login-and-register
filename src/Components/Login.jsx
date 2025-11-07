@@ -3,11 +3,8 @@ import React, { useState } from "react";
 import { FiMail, FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import { Bounce, toast } from "react-toastify";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
 import { sendEmailVerification } from "firebase/auth/web-extension";
 
 const Login = () => {
@@ -20,7 +17,7 @@ const Login = () => {
   });
 
   const [Error, setError] = useState({
-    nameError: "border-gray-300",
+    // nameError: "border-gray-300",
     emailError: "border-gray-300",
     passError: "border-gray-300",
   });
@@ -30,53 +27,52 @@ const Login = () => {
   const onSubmit = (e) => {
     e.preventDefault();
 
-    if (!form.username) {
-      setError((prev) => ({ ...prev, nameError: "border-red-500" }));
-    }
+   
     if (!form.email) {
       setError((prev) => ({ ...prev, emailError: "border-red-500" }));
     }
     if (!form.password) {
       setError((prev) => ({ ...prev, passError: "border-red-500" }));
     }
+    
 
-    // ------------api ------------
-    // createUserWithEmailAndPassword(auth, form.email, form.password)
-    //   .then((userCredential) => {
-    //     // ----------user anme catch api
-    //     console.log(userCredential);
-    //     updateProfile(auth.currentUser, { displayName: form.username })
-    //       .then(() => {
-    //         // ----authentications
+signInWithEmailAndPassword(auth, form.email, form.password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    if(user.emailVerified == false ){
+      toast.error('please verified your email!', {
+position: "top-right",
+autoClose: 5000,
+hideProgressBar: false,
+closeOnClick: false,
+pauseOnHover: true,
+draggable: true,
+progress: undefined,
+theme: "dark",
+transition: Bounce,
+});
+    }
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    if(errorCode){
+     toast.error('something went wrong!', {
+position: "top-right",
+autoClose: 5000,
+hideProgressBar: false,
+closeOnClick: false,
+pauseOnHover: true,
+draggable: true,
+progress: undefined,
+theme: "dark",
+transition: Bounce,
+});
+    }
+  });
 
-    //         sendEmailVerification(auth.currentUser).then(() => {
-    //           toast.success("Registration successful!");
-    //         });
-    //       })
-    //       .catch((error) => {
-    //         toast.error(error.message);
-    //       });
-    //   })
-    //   .catch((error) => {
-    //     const errorCode = error.code;
-    //     const errorMessage = error.message;
-    //     console.log(errorCode);
-
-    //     if (errorCode == "auth/email-already-in-use") {
-    //       toast.error(" Email already exist!", {
-    //         position: "top-right",
-    //         autoClose: 5000,
-    //         hideProgressBar: false,
-    //         closeOnClick: false,
-    //         pauseOnHover: true,
-    //         draggable: true,
-    //         progress: undefined,
-    //         theme: "dark",
-    //         transition: Bounce,
-    //       });
-    //     }
-    //     // ..
-    //   });
   };
 
   return (
@@ -87,7 +83,7 @@ const Login = () => {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
-          
+
           {/* Username */}
           {/* <label className="block">
             <span className="sr-only">Username</span>
@@ -175,9 +171,9 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-center text-sm text-gray-600">
-          Already have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/" className="text-indigo-600 font-medium">
-            Login
+            Register
           </Link>
         </div>
       </div>
