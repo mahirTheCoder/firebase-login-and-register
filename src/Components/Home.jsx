@@ -47,7 +47,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
+    <div className="min-h-screen  from-blue-50 via-white to-indigo-50 p-8">
       
       {/* ---------------- Navbar ---------------- */}
       <header className="flex justify-between items-center mb-10 animate-fade-in">

@@ -8,6 +8,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { sendEmailVerification } from "firebase/auth/web-extension";
 
 const Login = () => {
+  const navigate = useNavigate ();
   const auth = getAuth();
 
   const [form, setForm] = useState({
@@ -39,6 +40,7 @@ const Login = () => {
         // Signed in
         const user = userCredential.user;
         if (user.emailVerified == false) {
+          navigate("/Home");
           toast.success("Login successfully !", {
             position: "top-right",
             autoClose: 5000,
@@ -80,27 +82,6 @@ const Login = () => {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-6">
-          {/* Username */}
-          {/* <label className="block">
-            <span className="sr-only">Username</span>
-            <div
-              className={`flex items-center gap-2 px-3 py-2 rounded-md border ${Error.nameError} bg-gray-50`}
-            >
-              <FiUser className="text-gray-500" />
-              <input
-                onChange={(e) => {
-                  setForm((prev) => ({ ...prev, username: e.target.value }));
-                  setError((prev) => ({
-                    ...prev,
-                    username: "border-gray-300",
-                  }));
-                }}
-                name="username"
-                placeholder="Username"
-                className="w-full bg-transparent outline-none text-gray-900 placeholder-gray-400"
-              />
-            </div>
-          </label> */}
 
           {/* Email */}
           <label className="block">
