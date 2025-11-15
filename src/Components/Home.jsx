@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { FiTrash2, FiEdit, FiTrash, FiPlusCircle } from "react-icons/fi";
+import { LuSun, LuMoon } from "react-icons/lu";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -7,26 +9,30 @@ export default function Home() {
   const [newNote, setNewNote] = useState({ title: "", content: "" });
   const [editNote, setEditNote] = useState(null);
 
+  // ------------------- Dark/Light Mode -------------------
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
   const handleAddNote = (e) => {
     e.preventDefault();
     if (!newNote.title.trim() && !newNote.content.trim()) return;
-
-    const note = {
-      id: Date.now(),
-      ...newNote,
-    };
-
+    const note = { id: Date.now(), ...newNote };
     setNotes([note, ...notes]);
     setNewNote({ title: "", content: "" });
   };
 
   const handleDeleteNote = (id) => {
     const deleted = notes.find((note) => note.id === id);
-
-    // Store to Bin Page
     const binNotes = JSON.parse(localStorage.getItem("binNotes")) || [];
     localStorage.setItem("binNotes", JSON.stringify([...binNotes, deleted]));
-
     setNotes(notes.filter((n) => n.id !== id));
   };
 
@@ -38,131 +44,160 @@ export default function Home() {
   const handleUpdateNote = (e) => {
     e.preventDefault();
     setNotes(
-      notes.map((n) =>
-        n.id === editNote.id ? { ...n, ...newNote } : n
-      )
+      notes.map((n) => (n.id === editNote.id ? { ...n, ...newNote } : n))
     );
     setEditNote(null);
     setNewNote({ title: "", content: "" });
   };
 
   return (
-    <div className="min-h-screen  from-blue-50 via-white to-indigo-50 p-8">
-      
-      {/* ---------------- Navbar ---------------- */}
-      <header className="flex justify-between items-center mb-10 animate-fade-in">
-        <h1 className="text-4xl font-bold text-blue-500 bg-clip-text ">
-          My Notes
-        </h1>
+    <div
+      className="min-h-screen bg-gradient-to-br from-[#eef2ff] to-[#e0f2fe] 
+      dark:from-[#0f0f0f] dark:to-[#1a1a1a] p-8 flex justify-center text-gray-900 
+      dark:text-gray-100 transition-colors duration-300"
+    >
+      <div className="w-full max-w-[800px]">
 
-        <div className="space-x-3">
-          <button
-            onClick={() => navigate("/bin")}
-            className="px-5 py-2.5 rounded-lg bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 transition-all hover:scale-105"
-          >
-            🗑️ Bin
-          </button>
-          <button
-            onClick={() => navigate("/login")}
-            className="px-5 py-2.5 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-all hover:scale-105"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+        {/* ---------------- Navbar ---------------- */}
+        <header className="flex justify-between items-center mb-10">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 
+            dark:from-indigo-300 dark:to-blue-300 text-transparent bg-clip-text italic">
+            My Notes
+          </h1>
 
-      {/* ---------------- Form: Create / Edit ---------------- */}
-      <form
-        onSubmit={editNote ? handleUpdateNote : handleAddNote}
-        className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-10 animate-slide-up transition-all hover:shadow-xl"
-      >
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          {editNote ? "✏️ Edit Your Note" : "📝 Create a New Note"}
-        </h2>
-
-        <input
-          type="text"
-          placeholder="Enter note title..."
-          value={newNote.title}
-          onChange={(e) =>
-            setNewNote({ ...newNote, title: e.target.value })
-          }
-          className="w-full p-3 mb-3 border rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all outline-none"
-        />
-
-        <textarea
-          value={newNote.content}
-          onChange={(e) =>
-            setNewNote({ ...newNote, content: e.target.value })
-          }
-          rows="4"
-          placeholder="Write your note..."
-          className="w-full p-3 mb-4 border rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all outline-none"
-        ></textarea>
-
-        <div className="flex gap-4">
-          <button
-            className="px-6 py-2.5 rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 font-semibold transition-all"
-            type="submit"
-          >
-            {editNote ? "💾 Save Changes" : "➕ Add Note"}
-          </button>
-
-          {editNote && (
+          <div className="flex items-center gap-3">
             <button
-              type="button"
-              onClick={() => {
-                setEditNote(null);
-                setNewNote({ title: "", content: "" });
-              }}
-              className="px-6 py-2.5 rounded-lg bg-gray-300 text-gray-700 hover:bg-gray-400 font-semibold transition-all"
+              onClick={() => navigate("/bin")}
+              className="flex items-center gap-2 px-5 py-2 rounded-lg 
+              bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition 
+              dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800"
             >
-              Cancel
+              <FiTrash className="text-lg" />
+              Bin
             </button>
-          )}
-        </div>
-      </form>
 
-      {/* ---------------- Notes Grid ---------------- */}
-      {notes.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg animate-fade-in">
-          📭 No notes found. Create your first note above!
-        </p>
-      ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {notes.map((note, i) => (
-            <div
-              key={note.id}
-              className="bg-white p-5 rounded-xl border shadow-md hover:shadow-xl transition-all hover:-translate-y-2 animate-scale-in"
-              style={{ animationDelay: `${i * 60}ms` }}
+            {/* ---------------- Dark/Light Toggle Button ---------------- */}
+            <button
+              onClick={() =>
+                setTheme(theme === "light" ? "dark" : "light")
+              }
+              className="p-3 rounded-lg bg-gray-200 dark:bg-gray-800 hover:scale-105 transition"
             >
-              <h2 className="font-bold text-lg mb-2 text-gray-800 line-clamp-2">
-                {note.title}
-              </h2>
+              {theme === "light" ? (
+                <LuMoon className="text-xl" />
+              ) : (
+                <LuSun className="text-xl" />
+              )}
+            </button>
+          </div>
+        </header>
 
-              <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
-                {note.content}
-              </p>
+        {/* ---------------- Form: Create / Edit ---------------- */}
+        <form
+          onSubmit={editNote ? handleUpdateNote : handleAddNote}
+          className="bg-white dark:bg-[#121212] p-6 rounded-xl shadow-lg border 
+          border-gray-300 dark:border-gray-600 mb-10 transition-colors duration-300"
+        >
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+            {editNote ? "Edit Note" : "Create Note"}
+          </h2>
 
-              <div className="flex justify-end gap-3 pt-3 border-t">
-                <button
-                  onClick={() => handleEditNote(note)}
-                  className="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-all hover:scale-110"
-                >
-                  ✏️ Edit
-                </button>
+          <input
+            type="text"
+            placeholder="Enter note title..."
+            value={newNote.title}
+            onChange={(e) =>
+              setNewNote({ ...newNote, title: e.target.value })
+            }
+            className="w-full p-3 mb-3 border rounded-lg border-gray-300 
+            dark:border-gray-600 dark:bg-[#1b1b1b] dark:text-white 
+            focus:ring-2 focus:ring-indigo-400 outline-none transition-colors"
+          />
 
-                <button
-                  onClick={() => handleDeleteNote(note.id)}
-                  className="px-3 py-1.5 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-all hover:scale-110"
-                >
-                  🗑️ Delete
-                </button>
+          <textarea
+            value={newNote.content}
+            onChange={(e) =>
+              setNewNote({ ...newNote, content: e.target.value })
+            }
+            rows="3"
+            placeholder="Write your note..."
+            className="w-full p-3 mb-4 border rounded-lg border-gray-300 
+            dark:border-gray-600 dark:bg-[#1b1b1b] dark:text-white 
+            focus:ring-2 focus:ring-indigo-400 outline-none transition-colors"
+          ></textarea>
+
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-6 py-2 rounded-lg text-white 
+              bg-gradient-to-r from-indigo-500 to-blue-600 hover:scale-105 transition"
+            >
+              <FiPlusCircle /> {editNote ? "Save" : "Add Note"}
+            </button>
+
+            {editNote && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditNote(null);
+                  setNewNote({ title: "", content: "" });
+                }}
+                className="px-6 py-2 rounded-lg bg-gray-300 text-gray-700 
+                dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-400 
+                dark:hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* ---------------- Notes Grid ---------------- */}
+        {notes.length === 0 ? (
+          <p className="text-center text-gray-700 dark:text-gray-300 font-bold text-xl py-10">
+            🚫 No Notes Found
+          </p>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-6">
+            {notes.map((note) => (
+              <div
+                key={note.id}
+                className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border 
+                border-gray-300 dark:border-gray-600 shadow-md 
+                hover:shadow-xl transition hover:-translate-y-1"
+              >
+                <h2 className="font-bold text-lg mb-1 text-gray-800 dark:text-gray-100 line-clamp-1">
+                  {note.title}
+                </h2>
+
+                <p className="text-gray-600 dark:text-gray-300 mb-3 text-sm leading-relaxed line-clamp-2">
+                  {note.content}
+                </p>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-gray-300 dark:border-gray-600">
+                  <button
+                    onClick={() => handleEditNote(note)}
+                    className="flex items-center gap-1 px-3 py-1.5 
+                    bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 
+                    dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 transition"
+                  >
+                    <FiEdit /> Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteNote(note.id)}
+                    className="flex items-center gap-1 px-3 py-1.5 
+                    bg-red-100 text-red-600 rounded-md hover:bg-red-200 
+                    dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800 transition"
+                  >
+                    <FiTrash2 /> Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
